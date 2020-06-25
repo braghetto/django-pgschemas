@@ -1,11 +1,10 @@
 import re
 
 from django.conf import settings
-from django.db import connection
 from django.http import Http404
 from django.urls import set_urlconf, clear_url_caches
 
-from .schema import SchemaDescriptor
+from .schema import SchemaDescriptor, schema_handler
 from .urlresolvers import get_urlconf_from_schema
 from .utils import remove_www, get_domain_model
 
@@ -24,7 +23,7 @@ class TenantMiddleware:
 
     def __call__(self, request):
         hostname = remove_www(request.get_host().split(":")[0])
-        connection.set_schema_to_public()
+        schema_handler.set_schema_to_public()
 
         tenant = None
 
@@ -74,5 +73,5 @@ class TenantMiddleware:
         urlconf = get_urlconf_from_schema(tenant)
         request.urlconf = urlconf
         set_urlconf(urlconf)
-        connection.set_schema(tenant)
+        schema_handler.set_schema(tenant)
         return self.get_response(request)

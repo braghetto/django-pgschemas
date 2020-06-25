@@ -6,6 +6,8 @@ from django.core.management import call_command
 from django.core.management.base import BaseCommand, OutputWrapper, CommandError
 from django.db import connection, transaction, connections
 
+from ...schema import schema_handler
+
 
 def run_on_schema(
     schema_name,
@@ -52,7 +54,7 @@ def run_on_schema(
 
     if fork_db:
         connections.close_all()
-    connection.set_schema_to(schema_name)
+    schema_handler.set_schema_to(schema_name)
 
     if pass_schema_in_kwargs:
         kwargs.update({"schema_name": schema_name})

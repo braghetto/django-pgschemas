@@ -2,11 +2,10 @@ import re
 import sys
 
 from django.conf import settings
-from django.db import connection
 from django.urls import URLResolver
 
 from .utils import get_domain_model
-from .schema import SchemaDescriptor
+from .schema import SchemaDescriptor, schema_handler
 
 
 class TenantPrefixPattern:
@@ -17,7 +16,7 @@ class TenantPrefixPattern:
         DomainModel = get_domain_model()
         try:
             domain = DomainModel.objects.exclude(folder="").get(
-                tenant__schema_name=connection.schema.schema_name, domain=connection.schema.domain_url
+                tenant__schema_name=schema_handler.active.schema_name, domain=schema_handler.active.domain_url
             )
             return "{}/".format(domain.folder)
         except DomainModel.DoesNotExist:
